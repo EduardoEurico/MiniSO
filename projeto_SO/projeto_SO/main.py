@@ -3,11 +3,10 @@ import subprocess
 import hashlib
 import random
 import string
+import getpass
 import json
 import time
 import platform
-import tkinter as tk
-from tkinter import simpledialog
 
 USER_DATA_FILE = 'user_data.json'
 
@@ -39,20 +38,9 @@ def hash_password(password, salt):
     return hashlib.sha512((password + salt).encode()).hexdigest()
 
 
-def get_password():
-    # Cria uma janela oculta
-    root = tk.Tk()
-    root.withdraw()  # Esconde a janela principal
-    password = simpledialog.askstring("Senha", "Digite a senha:", show="*")  # Mostra a senha como asteriscos
-    return password
-
-
 def register_user():
     username = input("Digite o nome de usuário: ")
-    password = get_password()
-    if password is None:
-        print("A senha não pode ser vazia!")
-        return
+    password = input("Digite a senha: ")
     salt = generate_salt()
     password_hash = hash_password(password, salt)
     user_data = load_user_data()
@@ -67,7 +55,7 @@ def authenticate_user():
     if username not in user_data["users"]:
         print("Usuário não encontrado!")
         return None
-    password = get_password()
+    password = input("Digite a senha: ")
     salt = user_data["users"][username]["salt"]
     password_hash = hash_password(password, salt)
     if password_hash == user_data["users"][username]["password_hash"]:
@@ -215,6 +203,7 @@ def delete_directory(path, username, force=False):
         print(f"Diretório '{path}' apagado.")
     else:
         print("Erro: Diretório não encontrado.")
+
 
 
 def main():
