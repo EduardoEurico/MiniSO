@@ -3,7 +3,6 @@ import subprocess
 import hashlib
 import random
 import string
-import getpass
 import json
 import time
 import platform
@@ -39,12 +38,14 @@ def generate_salt():
 def hash_password(password, salt):
     return hashlib.sha512((password + salt).encode()).hexdigest()
 
+
 def get_password():
     # Cria uma janela oculta
     root = tk.Tk()
     root.withdraw()  # Esconde a janela principal
     password = simpledialog.askstring("Senha", "Digite a senha:", show="*")  # Mostra a senha como asteriscos
     return password
+
 
 def register_user():
     username = input("Digite o nome de usuário: ")
@@ -214,7 +215,6 @@ def delete_directory(path, username, force=False):
         print(f"Diretório '{path}' apagado.")
     else:
         print("Erro: Diretório não encontrado.")
-
 
 
 def main():
