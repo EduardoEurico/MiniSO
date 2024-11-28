@@ -174,7 +174,9 @@ def list_files(path, username):
     files = []
     for file in os.listdir(path):
         full_path = os.path.join(path, file)
-        if full_path in user_permissions and user_permissions[full_path] == username:
+        
+        # Verifica se o usuário tem permissão para ver o arquivo/diretório
+        if os.path.abspath(full_path) in user_permissions and user_permissions[os.path.abspath(full_path)] == username:
             files.append(file)
 
     if files:
@@ -186,27 +188,33 @@ def list_files(path, username):
 
 
 def create_file(path, username):
+    # Garantir que o diretório seja criado, se não existir
     directory, filename = os.path.split(path)
     if directory:
         os.makedirs(directory, exist_ok=True)
+    
+    # Criação do arquivo
     with open(path, 'w') as file:
         file.write("Conteúdo aleatório")
+    
+    # Salvar as permissões associadas ao caminho completo do arquivo
     user_data = load_user_data()
-    user_data["permissions"][path] = username
+    user_data["permissions"][os.path.abspath(path)] = username
     save_user_data(user_data)
+    
     log_operation(f"Arquivo '{path}' criado por {username}")
     print(f"Arquivo '{path}' criado por {username}")
 
 
 def delete_file(path, username):
     user_data = load_user_data()
-    if user_data["permissions"].get(path) != username:
+    if user_data["permissions"].get(os.path.abspath(path)) != username:
         print("Erro: Você não tem permissão para apagar este arquivo.")
         log_operation(f"Erro: {username} tentou apagar arquivo sem permissão: {path}")
         return
     if os.path.exists(path):
         os.remove(path)
-        del user_data["permissions"][path]
+        del user_data["permissions"][os.path.abspath(path)]
         save_user_data(user_data)
         log_operation(f"Arquivo '{path}' apagado por {username}")
         print(f"Arquivo '{path}' apagado.")
@@ -217,7 +225,7 @@ def delete_file(path, username):
 def create_directory(path, username):
     os.makedirs(path, exist_ok=True)
     user_data = load_user_data()
-    user_data["permissions"][path] = username
+    user_data["permissions"][os.path.abspath(path)] = username
     save_user_data(user_data)
     log_operation(f"Diretório '{path}' criado por {username}")
     print(f"Diretório '{path}' criado por {username}")
@@ -230,7 +238,7 @@ def delete_directory(path, username, force=False):
         print(f"Erro: O diretório '{path}' não existe.")
         return
 
-    if user_data["permissions"].get(path) != username:
+    if user_data["permissions"].get(os.path.abspath(path)) != username:
         print("Erro: Você não tem permissão para apagar este diretório.")
         log_operation(f"Erro: {username} tentou apagar diretório sem permissão: {path}")
         return
@@ -246,7 +254,7 @@ def delete_directory(path, username, force=False):
             except OSError:
                 print("Erro: O diretório não está vazio. Use '--force' para apagar.")
                 return
-        del user_data["permissions"][path]
+        del user_data["permissions"][os.path.abspath(path)]
         save_user_data(user_data)
         log_operation(f"Diretório '{path}' apagado por {username}")
         print(f"Diretório '{path}' apagado.")

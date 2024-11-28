@@ -1,5 +1,0 @@
-Usuário 'teste' criado com sucesso.
-Usuário 'teste' fez login com sucesso.
-[PID 9484] Executando comando: criar arquivo user_teste
-Arquivo 'user_teste' criado por teste
-[PID 9484] Executando comando: listar
